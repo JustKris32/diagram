@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Respiratory System: Airflow Pathway</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeInDown 1s ease;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            background: linear-gradient(45deg, #fff, #64b5f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+        
+        .diagram-container {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .diagram-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
+        svg {
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3));
+        }
+        
+        .pathway-line {
+            fill: none;
+            stroke: #64b5f6;
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-dasharray: 10, 5;
+            opacity: 0.6;
+            animation: dash 2s linear infinite;
+        }
+        
+        .air-particle {
+            fill: #fff;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.8));
+            animation: flow 3s ease-in-out infinite;
+        }
+        
+        .organ {
+            fill: rgba(255,255,255,0.15);
+            stroke: #fff;
+            stroke-width: 2;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .organ:hover {
+            fill: rgba(255,255,255,0.3);
+            transform: scale(1.02);
+        }
+        
+        .organ-label {
+            font-size: 14px;
+            font-weight: 600;
+            fill: #fff;
+            text-anchor: middle;
+            pointer-events: none;
+        }
+        
+        .info-panel {
+            background: rgba(255,255,255,0.95);
+            color: #1e3c72;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeInRight 1s ease;
+        }
+        
+        .step-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 5px solid #2a5298;
+            transform: translateX(0);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .step-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(42,82,152,0.1), transparent);
+            transition: width 0.3s ease;
+        }
+        
+        .step-card:hover::before {
+            width: 100%;
+        }
+        
+        .step-card:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .step-card.active {
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+            color: #fff;
+            border-left-color: #64b5f6;
+        }
+        
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            background: #2a5298;
+            color: #fff;
+            border-radius: 50%;
+            font-weight: 700;
+            margin-right: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .step-card.active .step-number {
+            background: #fff;
+            color: #2a5298;
+        }
+        
+        .step-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: inline-block;
+        }
+        
+        .step-desc {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            margin-left: 45px;
+            line-height: 1.5;
+        }
+        
+        .detail-box {
+            background: rgba(42,82,152,0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 2px solid rgba(42,82,152,0.2);
+        }
+        
+        .detail-box h3 {
+            color: #1e3c72;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .detail-box p {
+            color: #555;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+        
+        .controls {
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            margin: 0 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .alveoli-zoom {
+            margin-top: 30px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            display: none;
+        }
+        
+        .alveoli-zoom.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .alveoli-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .alveolus {
+            background: radial-gradient(circle at 30% 30%, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            border-radius: 50%;
+            aspect-ratio: 1;
+            position: relative;
+            box-shadow: inset -5px -5px 10px rgba(0,0,0,0.1);
+            animation: breathe 3s ease-in-out infinite;
+        }
+        
+        .alveolus::after {
+            content: '';
+            position: absolute;
+            top: 20%;
+            left: 20%;
+            width: 30%;
+            height: 30%;
+            background: rgba(255,255,255,0.6);
+            border-radius: 50%;
+        }
+        
+        .capillary {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 30%;
+            background: linear-gradient(90deg, #e74c3c, #c0392b);
+            border-radius: 0 0 50% 50%;
+            opacity: 0.7;
+        }
+        
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.3; }
+        }
+        
+        @keyframes dash {
+            to { stroke-dashoffset: -30; }
+        }
+        
+        @keyframes flow {
+            0%, 100% { opacity: 0; transform: translateY(0); }
+            50% { opacity: 1; transform: translateY(-10px); }
+        }
+        
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+            margin: 30px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #64b5f6, #fff);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 3px;
+        }
+        
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🫁 Pathway of Air</h1>
+            <p class="subtitle">From Nostrils to Alveoli: The Journey of Oxygen</p>
+        </header>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <div class="main-content">
+            <div class="diagram-container">
+                <svg viewBox="0 0 400 600" id="respiratorySvg">
+                    <!-- Pathway -->
+                    <path class="pathway-line" d="M 200 50 Q 200 80 200 100 Q 200 120 200 140 Q 200 160 200 180 Q 200 200 180 220 Q 160 240 160 260 Q 160 280 180 300 Q 200 320 200 340 Q 200 360 200 380 Q 200 400 200 420 Q 200 440 200 460 Q 200 480 200 500" />
+                    
+                    <!-- Nostrils -->
+                    <ellipse class="organ" id="nostrils" cx="200" cy="50" rx="30" ry="15" data-step="0"/>
+                    <text class="organ-label" x="200" y="55">Nostrils</text>
+                    
+                    <!-- Nasal Cavity -->
+                    <rect class="organ" id="nasal" x="170" y="70" width="60" height="40" rx="10" data-step="1"/>
+                    <text class="organ-label" x="200" y="95">Nasal Cavity</text>
+                    
+                    <!-- Pharynx -->
+                    <rect class="organ" id="pharynx" x="180" y="120" width="40" height="40" rx="5" data-step="2"/>
+                    <text class="organ-label" x="200" y="145">Pharynx</text>
+                    
+                    <!-- Larynx -->
+                    <rect class="organ" id="larynx" x="185" y="170" width="30" height="30" rx="5" data-step="3"/>
+                    <text class="organ-label" x="200" y="190">Larynx</text>
+                    
+                    <!-- Trachea -->
+                    <rect class="organ" id="trachea" x="190" y="210" width="20" height="80" rx="10" data-step="4"/>
+                    <text class="organ-label" x="230" y="250">Trachea</text>
+                    
+                    <!-- Bronchi -->
+                    <path class="organ" id="bronchi" d="M 190 290 Q 160 310 140 330 Q 160 310 190 290 Q 220 310 240 330" fill="none" stroke-width="8" data-step="5"/>
+                    <text class="organ-label" x="200" y="340">Bronchi</text>
+                    
+                    <!-- Bronchioles -->
+                    <path class="organ" id="bronchioles" d="M 140 330 Q 130 360 120 390 M 240 330 Q 250 360 260 390" fill="none" stroke-width="4" data-step="6"/>
+                    <text class="organ-label" x="200" y="380">Bronchioles</text>
+                    
+                    <!-- Lungs -->
+                    <path class="organ" id="lungs" d="M 120 200 Q 80 250 80 350 Q 80 450 120 480 Q 140 400 140 300 Q 140 250 120 200 M 280 200 Q 320 250 320 350 Q 320 450 280 480 Q 260 400 260 300 Q 260 250 280 200" data-step="7"/>
+                    <text class="organ-label" x="200" y="450">Lungs</text>
+                    
+                    <!-- Alveoli -->
+                    <circle class="organ" id="alveoli" cx="200" cy="520" r="40" fill="url(#alveoliGradient)" data-step="8"/>
+                    <text class="organ-label" x="200" y="525">Alveoli</text>
+                    
+                    <!-- Air particles -->
+                    <circle class="air-particle" cx="200" cy="50" r="4" style="animation-delay: 0s"/>
+                    <circle class="air-particle" cx="200" cy="100" r="4" style="animation-delay: 0.3s"/>
+                    <circle class="air-particle" cx="200" cy="150" r="4" style="animation-delay: 0.6s"/>
+                    <circle class="air-particle" cx="200" cy="200" r="4" style="animation-delay: 0.9s"/>
+                    <circle class="air-particle" cx="200" cy="250" r="4" style="animation-delay: 1.2s"/>
+                    <circle class="air-particle" cx="170" cy="300" r="4" style="animation-delay: 1.5s"/>
+                    <circle class="air-particle" cx="230" cy="300" r="4" style="animation-delay: 1.5s"/>
+                    
+                    <defs>
+                        <radialGradient id="alveoliGradient" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" style="stop-color:#ff9a9e;stop-opacity:0.8" />
+                            <stop offset="100%" style="stop-color:#fecfef;stop-opacity:0.4" />
+                        </radialGradient>
+                    </defs>
+                </svg>
+                
+                <div class="alveoli-zoom" id="alveoliZoom">
+                    <h3>🔬 Alveoli: Gas Exchange Surface</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 15px;">Tiny air sacs surrounded by capillaries where oxygen enters the blood</p>
+                    <div class="alveoli-grid">
+                        <div class="alveolus"><div class="capillary"></div></div>
+                        <div class="alveolus"><div class="capillary"></div></div>
+                        <div class="alveolus"><div class="capillary"></div></div>
+                        <div class="alveolus"><div class="capillary"></div></div>
+                        <div class="alveolus"><div class="capillary"></div></div>
+                        <div class="alveolus"><div class="capillary"></div></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="info-panel">
+                <h2 style="margin-bottom: 20px; color: #1e3c72;">📍 Trace the Pathway</h2>
+                <p style="color: #666; margin-bottom: 20px;">Click on any step to learn more about each structure:</p>
+                
+                <div class="step-card active" onclick="setStep(0)" data-step="0">
+                    <span class="step-number">1</span>
+                    <span class="step-title">Nostrils (Nares)</span>
+                    <div class="step-desc">The external openings where air enters. Hairs filter large particles.</div>
+                </div>
+                
+                <div class="step-card" onclick="setStep(1)" data-step="1">
+                    <span class="step-number">2</span>
+                    <span class="step-title">Nasal Cavity</span>
+                    <div class="step-desc">Air is warmed, moistened, and filtered by mucus and cilia.</div>
+                </div>
+                
+                <div class="step-card" onclick="setStep(2)" data-step="2">
+                    <span class="step-number">3</span>
+                    <span class="step-title">Pharynx (Throat)</span>
+                    <div class="step-desc">Shared pathway for air and food. Directs air toward the larynx.</div>
+                </div>
+                
+                <div class="step-card" onclick="setStep(3)" data-step="3">
+                    <span class="step-number">4</span>
+                    <span class="step-title">Larynx (Voice Box)</span>
+                    <div class="step-desc">Contains vocal cords. The epiglottis prevents food entry during swallowing.</div>
+                </div>
+                
+                <div class="step-card" onclick="setStep(4)" data-step="4">
+                    <span class="step-number">5</span>
+                    <span class="step-title">Trachea (Windpipe)</span>
+                    <div class="step-desc">Rigid tube supported by C-shaped cartilage rings, preventing collapse.</div>
+                </div>
+                
+                <div class="step-card" onclick="setStep(5)" data-step="5">
+                    <span class="step-number">6</span>
+                    <span class="step-title">Bronchi</span>
+                    <div class="step-desc">The trachea splits into two main bronchi, one to each lung.</div>
+                </div>
+                
+                <div class="step-card" onclick="setStep(6)" data-step="6">
+                    <span class="step-number">7</span>
+                    <span class="step-title">Bronchioles</span>
+                    <div class="step-desc">Smaller branches without cartilage, leading deeper into lung tissue.</div>
+                </div>
+                
+                <div class="step-card" onclick="setStep(7)" data-step="7">
+                    <span class="step-number">8</span>
+                    <span class="step-title">Lungs</span>
+                    <div class="step-desc">Spongy organs containing millions of alveoli. The left has 2 lobes, right has 3.</div>
+                </div>
+                
+                <div class="step-card" onclick="setStep(8)" data-step="8">
+                    <span class="step-number">9</span>
+                    <span class="step-title">Alveoli</span>
+                    <div class="step-desc">Microscopic air sacs (300 million per lung) where gas exchange occurs.</div>
+                </div>
+                
+                <div class="detail-box" id="detailBox">
+                    <h3>💡 Did You Know?</h3>
+                    <p id="detailText">The respiratory system processes about 11,000 liters of air per day!</p>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn" onclick="autoPlay()">▶ Auto Play</button>
+                    <button class="btn" onclick="resetFlow()">↻ Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentStep = 0;
+        const steps = document.querySelectorAll('.step-card');
+        const organs = document.querySelectorAll('.organ');
+        const progressFill = document.getElementById('progressFill');
+        const alveoliZoom = document.getElementById('alveoliZoom');
+        const detailText = document.getElementById('detailText');
+        
+        const facts = [
+            "You breathe about 20,000 times per day!",
+            "The nose produces 1 liter of mucus daily.",
+            "The pharynx is just 12-14 cm long in adults.",
+            "The larynx is also called the 'Adam's apple'.",
+            "The trachea is about 10-12 cm long and 2 cm wide.",
+            "The right bronchus is wider and more vertical than the left.",
+            "The smallest bronchioles are just 0.5 mm in diameter.",
+            "Your lungs contain 1,500 miles of airways!",
+            "Each alveolus is only 0.2 mm in diameter—thinner than a human hair!"
+        ];
+        
+        function setStep(step) {
+            currentStep = step;
+            
+            // Update cards
+            steps.forEach((card, index) => {
+                if (index === step) {
+                    card.classList.add('active');
+                } else {
+                    card.classList.remove('active');
+                }
+            });
+            
+            // Highlight organs
+            organs.forEach((organ, index) => {
+                if (index === step) {
+                    organ.style.fill = 'rgba(100,181,246,0.5)';
+                    organ.style.filter = 'drop-shadow(0 0 20px rgba(100,181,246,0.8))';
+                } else {
+                    organ.style.fill = index < step ? 'rgba(100,181,246,0.2)' : 'rgba(255,255,255,0.15)';
+                    organ.style.filter = 'none';
+                }
+            });
+            
+            // Update progress
+            progressFill.style.width = ((step + 1) / 9 * 100) + '%';
+            
+            // Show alveoli zoom at final step
+            if (step === 8) {
+                alveoliZoom.classList.add('show');
+            } else {
+                alveoliZoom.classList.remove('show');
+            }
+            
+            // Update fact
+            detailText.textContent = facts[step];
+        }
+        
+        function autoPlay() {
+            resetFlow();
+            let step = 0;
+            const interval = setInterval(() => {
+                setStep(step);
+                step++;
+                if (step >= 9) {
+                    clearInterval(interval);
+                }
+            }, 1500);
+        }
+        
+        function resetFlow() {
+            setStep(0);
+        }
+        
+        // Organ click handlers
+        organs.forEach((organ, index) => {
+            organ.addEventListener('click', () => setStep(index));
+        });
+        
+        // Initialize
+        setStep(0);
+    </script>
+</body>
+</html>
